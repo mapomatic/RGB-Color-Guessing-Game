@@ -13,11 +13,12 @@
 
     // Define specific bright colors for the launched fireworks
     const brightColors = [
-        { r: 255, g: 100, b: 100 },   // Bright red
-        { r: 100, g: 100, b: 255 },   // Bright blue
-        { r: 100, g: 255, b: 100 },   // Bright green
-        { r: 255, g: 255, b: 100 },   // Bright yellow
-        { r: 100, g: 255, b: 255 }    // Bright cyan
+        { r: 255, g: 0, b: 0 }, // Bright red
+        { r: 0, g: 0, b: 255 }, // Bright blue
+        { r: 0, g: 255, b: 0 }, // Bright green
+        { r: 255, g: 255, b: 0 }, // Bright yellow
+        { r: 0, g: 255, b: 255 }, // Bright cyan
+        { r: 255, g: 0, b: 255 }
     ];
 
     document.getElementById('fullscreenButton').addEventListener('click', () => {
@@ -83,7 +84,7 @@
 
     // Generate a bright variation of the base color
     function getBrightVariation(baseColor) {
-        const minBrightness = 150; // Minimum brightness threshold to ensure colors are bright
+        const minBrightness = 100; // Minimum brightness threshold to ensure colors are bright
         const variation = 50; // Brightness variation factor
         return {
             r: Math.max(minBrightness, Math.min(255, baseColor.r + Math.floor(Math.random() * variation) - variation / 2)),
@@ -144,9 +145,9 @@
     }
 
     // Firework explosion effect with multicolor and fading particles
-    function firework(x, y, singleColor = null) {
+    function firework(x, y, singleColor = null, isGuessFirework = false) {
         const particles = [];
-        const particleCount = 200; // Increase the number of particles
+        const particleCount = 400; // Increase the number of particles
         const gravity = 0.05; // Gravity acceleration
         const explosionRadius = 6; // Larger explosion radius
         const fireworkColor = singleColor || getRandomColor(); // Use a single color or random colors
@@ -154,7 +155,6 @@
         playFireworkSound(); // Play the sound when a firework is triggered
 
         for (let i = 0; i < particleCount; i++) {
-            // Generate a bright variation of the base color if singleColor is provided
             const color = singleColor ? getBrightVariation(fireworkColor) : getRandomColor();
             const angle = Math.random() * Math.PI * 2; // Random angle for circular spread
             const speed = Math.random() * explosionRadius; // Random speed for spread radius
@@ -176,7 +176,8 @@
                 elasticity, // Random elasticity effect for color blocks
                 groundElasticity: 0.2, // Lower elasticity specifically for bouncing off the bottom of the screen
                 bounceCount: 0, // Track the number of bounces
-                size // Random size for particles
+                size, // Random size for particles
+                isGuessFirework // Add flag to differentiate
             });
         }
 
@@ -187,12 +188,11 @@
     function handleCollision(particle) {
         colorBlocks.forEach(block => {
             if (
-                particle.x > block.x &&
-                particle.x < block.x + block.width &&
-                particle.y > block.y &&
-                particle.y < block.y + block.height
+                particle.x > block.x
+                && particle.x < block.x + block.width
+                && particle.y > block.y
+                && particle.y < block.y + block.height
             ) {
-                // Determine which side of the block the particle has collided with
                 const dxLeft = Math.abs(particle.x - block.x);
                 const dxRight = Math.abs(particle.x - (block.x + block.width));
                 const dyTop = Math.abs(particle.y - block.y);
@@ -200,7 +200,6 @@
 
                 const minDist = Math.min(dxLeft, dxRight, dyTop, dyBottom);
 
-                // Bounce off the closest side
                 if (minDist === dxLeft || minDist === dxRight) {
                     particle.vx *= -particle.elasticity; // Reverse horizontal velocity
                     particle.x += (minDist === dxLeft ? -1 : 1); // Prevent sticking by adjusting position
@@ -220,10 +219,8 @@
 
         // Update and draw each launch particle
         launchParticles.forEach((particle, index) => {
-            // Calculate distance to the target
-            const distanceToTarget = Math.sqrt(Math.pow(particle.targetX - particle.x, 2) + Math.pow(particle.targetY - particle.y, 2));
+            const distanceToTarget = Math.sqrt((particle.targetX - particle.x) ** 2 + (particle.targetY - particle.y) ** 2);
 
-            // Check if the particle is close enough to the target or has passed it
             if (distanceToTarget < 5 || (particle.vx * (particle.targetX - particle.x) <= 0 && particle.vy * (particle.targetY - particle.y) <= 0)) {
                 particle.callback(); // Trigger the explosion
                 launchParticles.splice(index, 1); // Remove the particle
@@ -244,15 +241,11 @@
         fireworks.forEach((particles, index) => {
             particles.forEach(particle => {
                 if (particle.life > 0) {
-                    // Only start fading after the particle has bounced at least twice
-                    if (particle.bounceCount >= 2) {
-                        const fadeStart = particle.maxLife * 0.9; // Start fading later to last longer
-                        const fadeEnd = particle.maxLife; // End of life
-                        const fadeProgress = Math.max(0, (particle.life - fadeStart) / (fadeEnd - fadeStart));
-                        particle.alpha = fadeProgress; // Alpha fades out after two bounces
-                    } else {
-                        particle.alpha = 1; // Fully opaque before two bounces
-                    }
+                    // Different fade timing based on firework type
+                    const fadeStart = particle.isGuessFirework ? particle.maxLife * 0.6 : particle.maxLife * 0.9; // Sooner fade for guess fireworks
+                    const fadeEnd = particle.maxLife; // End of life
+                    const fadeProgress = Math.max(0, (particle.life - fadeStart) / (fadeEnd - fadeStart));
+                    particle.alpha = fadeProgress; // Alpha fades out based on firework type
 
                     ctx.fillStyle = `rgba(${
                         parseInt(particle.color.slice(5, 8), 10)}, ${
@@ -291,23 +284,22 @@
 
     // Function to trigger multiple firework explosions at random positions
     function triggerMultipleFireworks() {
-        const explosions = 5; // Number of explosions
+        const explosions = 6; // Number of explosions
         const interval = 100; // Interval in milliseconds between explosions
         for (let i = 0; i < explosions; i++) {
             setTimeout(() => {
-                // Generate random positions within the top half of the screen, avoiding blocks
-                let x, y;
+                let x; let
+                    y;
                 do {
                     x = Math.random() * window.innerWidth;
                     y = Math.random() * (window.innerHeight / 2); // Top half of the screen
                 } while (colorBlocks.some(block => x > block.x && x < block.x + block.width && y > block.y && y < block.y + block.height));
 
-                // Use predefined bright colors for launched particles
                 const colorIndex = i % brightColors.length;
                 const color = brightColors[colorIndex];
 
-                // Launch the firework to the target position
-                launchFirework(x, y, () => firework(x, y, color));
+                // Pass the true flag for guess-triggered fireworks
+                launchFirework(x, y, () => firework(x, y, color, true));
             }, i * interval);
         }
     }
@@ -325,8 +317,8 @@
         const particle = {
             x: startX,
             y: startY,
-            vx: vx,
-            vy: vy,
+            vx,
+            vy,
             gravity: 0.005,
             callback,
             frame: 0,
@@ -376,7 +368,7 @@
     // Firework effect anywhere on click, except on color boxes
     document.addEventListener('click', event => {
         if (!event.target.classList.contains('color-box') && event.target.id !== 'fullscreenButton') {
-            firework(event.clientX, event.clientY);
+            firework(event.clientX, event.clientY); // No flag for click fireworks
         }
     });
 

@@ -63,6 +63,7 @@
     <div id="choices"></div>
 
     <div id="message"></div>
+	<button id="fullscreenButton">Go Fullscreen</button>
 
     <canvas id="fireworkCanvas"></canvas>
 	
@@ -78,6 +79,21 @@
 
         // Array to hold active fireworks
         const fireworks = [];
+		
+		document.getElementById('fullscreenButton').addEventListener('click', () => {
+            const elem = document.documentElement; // Fullscreen the entire page
+
+            // Request fullscreen
+            if (elem.requestFullscreen) {
+                elem.requestFullscreen();
+            } else if (elem.mozRequestFullScreen) { // Firefox
+                elem.mozRequestFullScreen();
+            } else if (elem.webkitRequestFullscreen) { // Chrome, Safari and Opera
+                elem.webkitRequestFullscreen();
+            } else if (elem.msRequestFullscreen) { // IE/Edge
+                elem.msRequestFullscreen();
+            }
+        });
 
         // Get all color blocks for collision detection
         let colorBlocks = [];

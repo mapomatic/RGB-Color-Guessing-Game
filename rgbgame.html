@@ -13,18 +13,18 @@
 			background-color: black; /* Set background to black */
 			color: white; /* Set text color to white */
 		}
-.color-box {
-    display: inline-block;
-    width: 100px;
-    height: 100px;
-    margin: 10px;
-    cursor: pointer;
-    border-radius: 8px;
-    border: none; /* Ensure border is removed */
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.3), rgba(0, 0, 0, 0.2)); /* Gradient for 3D effect */
-    /* Remove the box-shadow line */
-    /* box-shadow: inset 0px 0px 0px 5px ${darkerColor}, 3px 3px 8px rgba(0, 0, 0, 0.5); */
-}
+		.color-box {
+			display: inline-block;
+			width: 100px;
+			height: 100px;
+			margin: 10px;
+			cursor: pointer;
+			border-radius: 8px;
+			border: none; /* Ensure border is removed */
+			background: linear-gradient(135deg, rgba(255, 255, 255, 0.3), rgba(0, 0, 0, 0.2)); /* Gradient for 3D effect */
+			/* Remove the box-shadow line */
+			/* box-shadow: inset 0px 0px 0px 5px ${darkerColor}, 3px 3px 8px rgba(0, 0, 0, 0.5); */
+		}
         #message {
             margin-top: 20px;
             font-size: 20px;
@@ -50,6 +50,19 @@
 			position: relative; /* Ensure elements are positioned relative */
 			z-index: 1; /* Set this higher than the canvas to keep text in front */
 			color: white; /* Keep text color consistent with the other elements */
+		}
+		#fullscreenButton {
+			position: fixed; /* Keep the button fixed in place */
+			bottom: 20px; /* Space from the bottom */
+			right: 20px; /* Space from the right */
+			padding: 5px 10px; /* Smaller padding */
+			font-size: 14px; /* Smaller font size */
+			background-color: #007bff;
+			color: white;
+			border: none;
+			border-radius: 5px;
+			cursor: pointer;
+			z-index: 2; /* Ensure it stays above the canvas */
 		}
 }
 
@@ -81,19 +94,46 @@
         const fireworks = [];
 		
 		document.getElementById('fullscreenButton').addEventListener('click', () => {
-            const elem = document.documentElement; // Fullscreen the entire page
+			const elem = document.documentElement; // Fullscreen the entire page
 
-            // Request fullscreen
-            if (elem.requestFullscreen) {
-                elem.requestFullscreen();
-            } else if (elem.mozRequestFullScreen) { // Firefox
-                elem.mozRequestFullScreen();
-            } else if (elem.webkitRequestFullscreen) { // Chrome, Safari and Opera
-                elem.webkitRequestFullscreen();
-            } else if (elem.msRequestFullscreen) { // IE/Edge
-                elem.msRequestFullscreen();
-            }
-        });
+			// Request fullscreen
+			if (elem.requestFullscreen) {
+				elem.requestFullscreen();
+			} else if (elem.mozRequestFullScreen) { // Firefox
+				elem.mozRequestFullScreen();
+			} else if (elem.webkitRequestFullscreen) { // Chrome, Safari and Opera
+				elem.webkitRequestFullscreen();
+			} else if (elem.msRequestFullscreen) { // IE/Edge
+				elem.msRequestFullscreen();
+			}
+		});
+		
+		function updateCollisionBoxes() {
+			colorBlocks = Array.from(document.querySelectorAll('.color-box')).map(box => {
+				const rect = box.getBoundingClientRect();
+				return {
+					x: rect.left,
+					y: rect.top,
+					width: rect.width,
+					height: rect.height
+				};
+			});
+		}
+
+		// Event listeners to handle fullscreen changes
+		document.addEventListener('fullscreenchange', toggleFullscreenButton);
+		document.addEventListener('webkitfullscreenchange', toggleFullscreenButton);
+		document.addEventListener('mozfullscreenchange', toggleFullscreenButton);
+		document.addEventListener('msfullscreenchange', toggleFullscreenButton);
+		
+		function toggleFullscreenButton() {
+			const fullscreenButton = document.getElementById('fullscreenButton');
+			if (document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement) {
+				fullscreenButton.style.display = 'none'; // Hide button in fullscreen mode
+			} else {
+				fullscreenButton.style.display = 'block'; // Show button when not in fullscreen mode
+			}
+		}
 
         // Get all color blocks for collision detection
         let colorBlocks = [];
@@ -162,16 +202,8 @@
                 choicesContainer.appendChild(colorBox);
             }
 
-            // Update colorBlocks with the current color boxes
-            colorBlocks = Array.from(document.querySelectorAll('.color-box')).map(box => {
-                const rect = box.getBoundingClientRect();
-                return {
-                    x: rect.left,
-                    y: rect.top,
-                    width: rect.width,
-                    height: rect.height
-                };
-            });
+            // Update colorBlocks with the current color boxes positions
+			updateCollisionBoxes();
         }
 
 		// Play firework explosion sound with clones
@@ -353,11 +385,12 @@
         window.addEventListener('resize', () => {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
+			updateCollisionBoxes(); // Recalculate collision boxes positions on resize
         });
 
         // Firework effect anywhere on click, except on color boxes
         document.addEventListener('click', (event) => {
-            if (!event.target.classList.contains('color-box')) {
+            if (!event.target.classList.contains('color-box') && event.target.id !== 'fullscreenButton') {
                 firework(event.clientX, event.clientY);
             }
         });

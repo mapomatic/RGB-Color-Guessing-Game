@@ -19,7 +19,7 @@
         { r: 0, g: 255, b: 0 }, // Bright green
         { r: 255, g: 255, b: 0 }, // Bright yellow
         { r: 0, g: 255, b: 255 }, // Bright cyan
-        { r: 255, g: 0, b: 255 }  // Bright magenta
+        { r: 255, g: 0, b: 255 } // Bright magenta
     ];
 
     document.getElementById('fullscreenButton').addEventListener('click', () => {
@@ -107,31 +107,36 @@
         const correctIndex = getRandomInt(3);
 
         // Create 3 color options
-        for (let i = 0; i < 3; i++) {
-            const colorBox = document.createElement('div');
-            colorBox.classList.add('color-box');
+        // Create 3 color options
+for (let i = 0; i < 3; i++) {
+    const colorBox = document.createElement('div');
+    colorBox.classList.add('color-box');
 
-            // The correct color goes into the correct box
-            let boxColor;
-            if (i === correctIndex) {
-                boxColor = color;
-                colorBox.style.backgroundColor = colorToGuess;
-                colorBox.dataset.correct = 'true';
-            } else {
-                boxColor = getRandomColor();
-                colorBox.style.backgroundColor = `rgb(${boxColor.r}, ${boxColor.g}, ${boxColor.b})`;
-            }   
+    // The correct color goes into the correct box
+    let boxColor;
+    if (i === correctIndex) {
+        boxColor = color;
+        colorBox.style.backgroundColor = colorToGuess;
+        colorBox.dataset.correct = 'true';
+    } else {
+        boxColor = getRandomColor();
+        colorBox.style.backgroundColor = `rgb(${boxColor.r}, ${boxColor.g}, ${boxColor.b})`;
+    }
 
-            // Change this section to use a fixed dark gray color for the border:
-            colorBox.style.boxShadow = 'inset 0px 0px 0px 3px rgba(100, 100, 100, 0.1), /* Light border */'
-            + '\ninset 0px 0px 10px rgba(255, 255, 255, 1) /* Gradient effect for depth */';
+    // Set the box shadow to match the color of the box for an outer glow effect
+    const glowColor = `rgba(${boxColor.r}, ${boxColor.g}, ${boxColor.b}, 0.6)`; // Adjust opacity as needed
+    colorBox.style.boxShadow = `
+        0 0 15px ${glowColor},  /* Outer glow effect */
+        0 0 25px ${glowColor}   /* Additional softer glow */
+    `;
 
-            colorBox.addEventListener('click', function colorBoxClick() {
-                checkAnswer(this);
-            });
+    colorBox.addEventListener('click', function colorBoxClick() {
+        checkAnswer(this);
+    });
 
-            choicesContainer.appendChild(colorBox);
-        }
+    choicesContainer.appendChild(colorBox);
+}
+
 
         // Update colorBlocks with the current color boxes positions
         updateCollisionBoxes();
@@ -187,18 +192,18 @@
     function handleCollision(particle) {
         colorBlocks.forEach((block, index) => {
             if (
-                particle.x > block.x &&
-                particle.x < block.x + block.width &&
-                particle.y > block.y &&
-                particle.y < block.y + block.height
+                particle.x > block.x
+                && particle.x < block.x + block.width
+                && particle.y > block.y
+                && particle.y < block.y + block.height
             ) {
                 const dxLeft = Math.abs(particle.x - block.x);
                 const dxRight = Math.abs(particle.x - (block.x + block.width));
                 const dyTop = Math.abs(particle.y - block.y);
                 const dyBottom = Math.abs(particle.y - (block.y + block.height));
-    
+
                 const minDist = Math.min(dxLeft, dxRight, dyTop, dyBottom);
-    
+
                 if (minDist === dxLeft || minDist === dxRight) {
                     particle.vx *= -particle.elasticity; // Reverse horizontal velocity
                     particle.x += (minDist === dxLeft ? -1 : 1); // Prevent sticking by adjusting position
@@ -206,12 +211,11 @@
                     particle.vy *= -particle.elasticity; // Reverse vertical velocity
                     particle.y += (minDist === dyTop ? -1 : 1); // Prevent sticking by adjusting position
                 }
-    
+
                 particle.bounceCount++; // Increment bounce count
             }
         });
     }
-    
 
     // Animate all fireworks and launch particles
     function animate() {
@@ -291,7 +295,8 @@
         const interval = 100; // Interval in milliseconds between explosions
         for (let i = 0; i < explosions; i++) {
             setTimeout(() => {
-                let x, y;
+                let x; let
+                    y;
                 do {
                     x = Math.random() * window.innerWidth;
                     y = Math.random() * (window.innerHeight / 2); // Top half of the screen
@@ -331,6 +336,7 @@
         launchParticles.push(particle);
     }
 
+    
     // Check if the selected answer is correct
     function checkAnswer(selectedBox) {
         if (disableClick) return;
@@ -370,153 +376,160 @@
             });
         }
     
-        // Restart the game after a short delay
+        // Show "Click to Continue" button instead of a timeout
         disableClick = true;
-        const timeoutLength = isCorrect ? 2000 : 2500;
-        setTimeout(() => {
-            disableClick = false;
-            message.textContent = '';
-            setupGame();
-        }, timeoutLength);
-    }
-    
-    
-    
-
-// Create shatter pieces for a wrong color block guess
-function shatterBlock(block) {
-    const pieces = [];
-    const rows = 6; // Number of rows to split into
-    const cols = 6; // Number of columns to split into
-    const pieceWidth = block.width / cols; // Width of each piece
-    const pieceHeight = block.height / rows; // Height of each piece
-    const gravity = 0.3; // Gravity effect on the pieces
-
-    for (let row = 0; row < rows; row++) {
-        for (let col = 0; col < cols; col++) {
-            const x = block.x + col * pieceWidth;
-            const y = block.y + row * pieceHeight;
-            const vx = (Math.random() - 0.5) * 1; // Random horizontal velocity
-            const vy = Math.random() * -2; // Random upward velocity
-            const rotationSpeed = (Math.random() - 0.5) * 0.2; // Random rotation speed
-
-            // Determine which corner should be rounded
-            let borderRadius = '0';
-            if (row === 0 && col === 0) {
-                borderRadius = '10px 0 0 0'; // Top-left corner rounded
-            } else if (row === 0 && col === cols - 1) {
-                borderRadius = '0 10px 0 0'; // Top-right corner rounded
-            } else if (row === rows - 1 && col === 0) {
-                borderRadius = '0 0 0 10px'; // Bottom-left corner rounded
-            } else if (row === rows - 1 && col === cols - 1) {
-                borderRadius = '0 0 10px 0'; // Bottom-right corner rounded
-            }
-
-            pieces.push({
-                x,
-                y,
-                size: Math.min(pieceWidth, pieceHeight), // Use the smaller dimension for size
-                vx,
-                vy,
-                gravity,
-                rotation: 0,
-                rotationSpeed,
-                width: pieceWidth,
-                height: pieceHeight,
-                color: block.color,
-                borderRadius // Add the borderRadius property
-            });
-        }
+        showContinueButton();
     }
 
-    shatterPieces.push(...pieces);
+    // Function to show the "Click to Continue" button
+function showContinueButton() {
+    const continueButton = document.createElement('button');
+    continueButton.textContent = 'Continue';
+    continueButton.id = 'continueButton';
+    continueButton.classList.add('continue-button'); // Apply the CSS class
 
-    // Remove the shattered block's boundaries from the collision array
-    colorBlocks = colorBlocks.filter(b => !(b.x === block.x && b.y === block.y && b.width === block.width && b.height === block.height));
-}
+    document.body.appendChild(continueButton);
 
-
-
-
-
-// Animate shatter pieces
-function animateShatterPieces() {
-    shatterPieces.forEach((piece, index) => {
-        piece.vy += piece.gravity; // Apply gravity
-        piece.x += piece.vx; // Update horizontal position
-        piece.y += piece.vy; // Update vertical position
-        piece.rotation += piece.rotationSpeed; // Update rotation
-
-        ctx.save();
-        ctx.translate(piece.x + piece.width / 2, piece.y + piece.height / 2);
-        ctx.rotate(piece.rotation);
-        ctx.fillStyle = piece.color;
-
-        ctx.beginPath();
-
-        // Apply the correct rounded corner based on the piece's borderRadius property
-        // Modify the radius to match the original blocks' rounding
-const originalBlockRadius = 8; // Assume the original blocks have a radius of 5px; adjust this value if needed.
-
-// Apply the correct rounded corner based on the piece's borderRadius property
-if (piece.borderRadius === '10px 0 0 0') { // Top-left corner rounded
-    ctx.moveTo(-piece.width / 2 + originalBlockRadius, -piece.height / 2);
-    ctx.arcTo(-piece.width / 2, -piece.height / 2, -piece.width / 2, -piece.height / 2 + originalBlockRadius, originalBlockRadius);
-    ctx.lineTo(-piece.width / 2, piece.height / 2);
-    ctx.lineTo(piece.width / 2, piece.height / 2);
-    ctx.lineTo(piece.width / 2, -piece.height / 2);
-} else if (piece.borderRadius === '0 10px 0 0') { // Top-right corner rounded
-    ctx.moveTo(-piece.width / 2, -piece.height / 2);
-    ctx.lineTo(piece.width / 2 - originalBlockRadius, -piece.height / 2);
-    ctx.arcTo(piece.width / 2, -piece.height / 2, piece.width / 2, -piece.height / 2 + originalBlockRadius, originalBlockRadius);
-    ctx.lineTo(piece.width / 2, piece.height / 2);
-    ctx.lineTo(-piece.width / 2, piece.height / 2);
-} else if (piece.borderRadius === '0 0 0 10px') { // Bottom-left corner rounded
-    ctx.moveTo(-piece.width / 2, -piece.height / 2);
-    ctx.lineTo(piece.width / 2, -piece.height / 2);
-    ctx.lineTo(piece.width / 2, piece.height / 2);
-    ctx.lineTo(-piece.width / 2 + originalBlockRadius, piece.height / 2); // Use the original block's radius
-    ctx.arcTo(-piece.width / 2, piece.height / 2, -piece.width / 2, piece.height / 2 - originalBlockRadius, originalBlockRadius);
-} else if (piece.borderRadius === '0 0 10px 0') { // Bottom-right corner rounded
-    ctx.moveTo(-piece.width / 2, -piece.height / 2);
-    ctx.lineTo(piece.width / 2, -piece.height / 2);
-    ctx.lineTo(piece.width / 2, piece.height / 2 - originalBlockRadius);
-    ctx.arcTo(piece.width / 2, piece.height / 2, piece.width / 2 - originalBlockRadius, piece.height / 2, originalBlockRadius);
-    ctx.lineTo(-piece.width / 2, piece.height / 2);
-} else {
-    // For pieces without any rounded corners
-    ctx.rect(-piece.width / 2, -piece.height / 2, piece.width, piece.height);
-}
-        ctx.closePath();
-        ctx.fill();
-
-        ctx.restore();
-
-        // Remove pieces that have fallen off the screen
-        if (piece.y - piece.height > canvas.height) {
-            shatterPieces.splice(index, 1);
-        }
+    continueButton.addEventListener('click', () => {
+        document.body.removeChild(continueButton); // Remove button after click
+        disableClick = false;
+        message.textContent = '';
+        setupGame();
     });
 }
 
 
+    // Create shatter pieces for a wrong color block guess
+    function shatterBlock(block) {
+        const pieces = [];
+        const rows = 6; // Number of rows to split into
+        const cols = 6; // Number of columns to split into
+        const pieceWidth = block.width / cols; // Width of each piece
+        const pieceHeight = block.height / rows; // Height of each piece
+        const gravity = 0.3; // Gravity effect on the pieces
 
+        for (let row = 0; row < rows; row++) {
+            for (let col = 0; col < cols; col++) {
+                const x = block.x + col * pieceWidth;
+                const y = block.y + row * pieceHeight;
+                const vx = (Math.random() - 0.5) * 1; // Random horizontal velocity
+                const vy = Math.random() * -2; // Random upward velocity
+                const rotationSpeed = (Math.random() - 0.5) * 0.2; // Random rotation speed
 
-function fadeBlock(blockElement) {
-    let opacity = 1;
-    const targetOpacity = 0.5; // Target opacity for partial fade
-    const fadeInterval = setInterval(() => {
-        opacity -= 0.05; // Reduce opacity by 5% each frame
-        if (opacity <= targetOpacity) {
-            clearInterval(fadeInterval);
-            blockElement.style.opacity = targetOpacity; // Set to target opacity when fade is complete
-        } else {
-            blockElement.style.opacity = opacity; // Apply the fade effect
+                // Determine which corner should be rounded
+                let borderRadius = '0';
+                if (row === 0 && col === 0) {
+                    borderRadius = '10px 0 0 0'; // Top-left corner rounded
+                } else if (row === 0 && col === cols - 1) {
+                    borderRadius = '0 10px 0 0'; // Top-right corner rounded
+                } else if (row === rows - 1 && col === 0) {
+                    borderRadius = '0 0 0 10px'; // Bottom-left corner rounded
+                } else if (row === rows - 1 && col === cols - 1) {
+                    borderRadius = '0 0 10px 0'; // Bottom-right corner rounded
+                }
+
+                pieces.push({
+                    x,
+                    y,
+                    size: Math.min(pieceWidth, pieceHeight), // Use the smaller dimension for size
+                    vx,
+                    vy,
+                    gravity,
+                    rotation: 0,
+                    rotationSpeed,
+                    width: pieceWidth,
+                    height: pieceHeight,
+                    color: block.color,
+                    borderRadius // Add the borderRadius property
+                });
+            }
         }
-    }, 15); // Adjust the interval timing for smoother animation if needed
-}
 
+        shatterPieces.push(...pieces);
 
+        // Remove the shattered block's boundaries from the collision array
+        colorBlocks = colorBlocks.filter(b => !(b.x === block.x && b.y === block.y && b.width === block.width && b.height === block.height));
+    }
+
+    // Animate shatter pieces
+    function animateShatterPieces() {
+        shatterPieces.forEach((piece, index) => {
+            piece.vy += piece.gravity; // Apply gravity
+            piece.x += piece.vx; // Update horizontal position
+            piece.y += piece.vy; // Update vertical position
+            piece.rotation += piece.rotationSpeed; // Update rotation
+
+            ctx.save();
+            ctx.translate(piece.x + piece.width / 2, piece.y + piece.height / 2);
+            ctx.rotate(piece.rotation);
+            ctx.fillStyle = piece.color;
+
+            ctx.beginPath();
+
+            // Apply the correct rounded corner based on the piece's borderRadius property
+            // Modify the radius to match the original blocks' rounding
+            const originalBlockRadius = 8; // Assume the original blocks have a radius of 5px; adjust this value if needed.
+
+            // Apply the correct rounded corner based on the piece's borderRadius property
+            if (piece.borderRadius === '10px 0 0 0') { // Top-left corner rounded
+                ctx.moveTo(-piece.width / 2 + originalBlockRadius, -piece.height / 2);
+                ctx.arcTo(-piece.width / 2, -piece.height / 2, -piece.width / 2, -piece.height / 2 + originalBlockRadius, originalBlockRadius);
+                ctx.lineTo(-piece.width / 2, piece.height / 2);
+                ctx.lineTo(piece.width / 2, piece.height / 2);
+                ctx.lineTo(piece.width / 2, -piece.height / 2);
+            } else if (piece.borderRadius === '0 10px 0 0') { // Top-right corner rounded
+                ctx.moveTo(-piece.width / 2, -piece.height / 2);
+                ctx.lineTo(piece.width / 2 - originalBlockRadius, -piece.height / 2);
+                ctx.arcTo(piece.width / 2, -piece.height / 2, piece.width / 2, -piece.height / 2 + originalBlockRadius, originalBlockRadius);
+                ctx.lineTo(piece.width / 2, piece.height / 2);
+                ctx.lineTo(-piece.width / 2, piece.height / 2);
+            } else if (piece.borderRadius === '0 0 0 10px') { // Bottom-left corner rounded
+                ctx.moveTo(-piece.width / 2, -piece.height / 2);
+                ctx.lineTo(piece.width / 2, -piece.height / 2);
+                ctx.lineTo(piece.width / 2, piece.height / 2);
+                ctx.lineTo(-piece.width / 2 + originalBlockRadius, piece.height / 2); // Use the original block's radius
+                ctx.arcTo(-piece.width / 2, piece.height / 2, -piece.width / 2, piece.height / 2 - originalBlockRadius, originalBlockRadius);
+            } else if (piece.borderRadius === '0 0 10px 0') { // Bottom-right corner rounded
+                ctx.moveTo(-piece.width / 2, -piece.height / 2);
+                ctx.lineTo(piece.width / 2, -piece.height / 2);
+                ctx.lineTo(piece.width / 2, piece.height / 2 - originalBlockRadius);
+                ctx.arcTo(piece.width / 2, piece.height / 2, piece.width / 2 - originalBlockRadius, piece.height / 2, originalBlockRadius);
+                ctx.lineTo(-piece.width / 2, piece.height / 2);
+            } else {
+                // For pieces without any rounded corners
+                ctx.rect(-piece.width / 2, -piece.height / 2, piece.width, piece.height);
+            }
+            ctx.closePath();
+            ctx.fill();
+
+            ctx.restore();
+
+            // Remove pieces that have fallen off the screen
+            if (piece.y - piece.height > canvas.height) {
+                shatterPieces.splice(index, 1);
+            }
+        });
+    }
+
+    function fadeBlock(blockElement) {
+        const targetColor = '#333333'; // Dark gray color for the fade effect
+        let opacity = 1;
+        const fadeInterval = setInterval(() => {
+            opacity -= 0.05; // Reduce opacity by 5% each frame
+            if (opacity <= 0.5) { // Fade until opacity is 50%
+                clearInterval(fadeInterval);
+                blockElement.style.opacity = 0.5; // Set to 50% opacity when fade is complete
+                blockElement.style.backgroundColor = targetColor; // Set the background color to dark gray
+                blockElement.style.boxShadow = 'none'; // Remove the glow effect
+            } else {
+                blockElement.style.opacity = opacity; // Apply the fade effect
+                // Adjust the glow opacity along with the block's fade
+                blockElement.style.boxShadow = `0 0 15px rgba(255, 255, 255, ${opacity * 0.6}), 
+                                                 0 0 25px rgba(255, 255, 255, ${opacity * 0.6})`; // Fading glow
+            }
+        }, 15); // Adjust the interval timing for smoother animation if needed
+    }
+    
 
     // Start the game when the page loads
     setupGame();
@@ -528,12 +541,35 @@ function fadeBlock(blockElement) {
         updateCollisionBoxes(); // Recalculate collision boxes positions on resize
     });
 
-    // Firework effect anywhere on click, except on color boxes
-    document.addEventListener('click', event => {
-        if (!event.target.classList.contains('color-box') && event.target.id !== 'fullscreenButton') {
-            firework(event.clientX, event.clientY); // No flag for click fireworks
+// Firework effect anywhere on click, except on color boxes and specific buttons
+document.addEventListener('click', event => {
+    // Check if the click is not on a color box, the fullscreen button, or the continue button
+    if (!event.target.classList.contains('color-box') 
+        && event.target.id !== 'fullscreenButton' 
+        && event.target.id !== 'continueButton') {
+        firework(event.clientX, event.clientY); // No flag for click fireworks
+    }
+});
+
+    document.addEventListener('DOMContentLoaded', () => {
+        // Select the elements
+        const title = document.querySelector('h1'); // Select the game title
+        const instructions = document.querySelector('p'); // Select the instruction line
+    
+        // Function to fade out an element
+        function fadeOutElement(element, delay) {
+            setTimeout(() => {
+                element.classList.add('fade-out'); // Add the fade-out class after delay
+            }, delay);
         }
+    
+        // Fade out the title first
+        fadeOutElement(title, 2000); // Fade out the title after 2 seconds
+    
+        // Fade out the instructions after the title has faded out
+        fadeOutElement(instructions, 4000); // Fade out the instructions after an additional 2 seconds
     });
+       
 
     // Start animating all particles
     animate();

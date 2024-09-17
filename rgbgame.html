@@ -25,10 +25,30 @@
 			/* Remove the box-shadow line */
 			/* box-shadow: inset 0px 0px 0px 5px ${darkerColor}, 3px 3px 8px rgba(0, 0, 0, 0.5); */
 		}
-        #message {
-            margin-top: 20px;
-            font-size: 20px;
-        }
+        #continueButton {
+    display: block; /* Make the button a block element */
+    margin: 20px auto 0; /* Add top margin to separate from the message */
+    padding: 15px 30px; /* Increased padding for a larger button */
+    font-size: 18px; /* Larger font size */
+    background-color: #28a745; /* Nice green color */
+    color: white;
+    border: none;
+    border-radius: 8px; /* Slightly larger border radius for a softer look */
+    cursor: pointer;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Add a subtle shadow for depth */
+    transition: background-color 0.3s, transform 0.3s; /* Smooth transitions */
+    z-index: 3; /* Keep a high z-index to ensure visibility over other content */
+}
+
+#continueButton:hover {
+    background-color: #218838; /* Darker green on hover */
+    transform: scale(1.05); /* Slight scale effect on hover */
+}
+
+#message {
+    margin-bottom: 20px; /* Space between the message and the button */
+    font-size: 20px;
+}
         #rgbValue {
             font-size: 24px;
             font-weight: bold;
@@ -64,6 +84,10 @@
 			cursor: pointer;
 			z-index: 2; /* Ensure it stays above the canvas */
 		}
+        .fade-out {
+            opacity: 0;                /* Target opacity for fade-out */
+            transition: opacity 2s;    /* Smooth transition over 2 seconds */
+        }
     </style>
     <script src="script.js" defer></script>
 </head>

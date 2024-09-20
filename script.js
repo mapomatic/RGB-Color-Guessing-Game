@@ -189,7 +189,7 @@
 
     // Check and handle collisions between particles and color blocks
     function handleCollision(particle) {
-        colorBlocks.forEach((block, index) => {
+        colorBlocks.forEach(block => {
             if (
                 particle.x > block.x
                 && particle.x < block.x + block.width
@@ -333,50 +333,6 @@
         };
 
         launchParticles.push(particle);
-    }
-
-    // Check if the selected answer is correct
-    function checkAnswer(selectedBox) {
-        if (disableClick) return;
-        const isCorrect = selectedBox.dataset.correct === 'true';
-        const message = document.getElementById('message');
-
-        if (isCorrect) {
-            message.textContent = 'Correct! You guessed the color!';
-            message.style.color = 'green';
-
-            // Trigger multiple fireworks at random positions in the top half of the screen
-            triggerMultipleFireworks();
-
-            // Fade all incorrect color blocks
-            document.querySelectorAll('.color-box').forEach(box => {
-                if (!box.dataset.correct) {
-                    fadeBlock(box);
-                }
-            });
-        } else {
-            message.textContent = 'Wrong! Try again!';
-            message.style.color = 'red';
-
-            // Shatter all incorrect color blocks
-            document.querySelectorAll('.color-box').forEach(box => {
-                const rect = box.getBoundingClientRect();
-                if (!box.dataset.correct) {
-                    shatterBlock({
-                        x: rect.left,
-                        y: rect.top,
-                        width: rect.width,
-                        height: rect.height,
-                        color: window.getComputedStyle(box).backgroundColor
-                    });
-                    box.style.visibility = 'hidden'; // Hide the block after shattering
-                }
-            });
-        }
-
-        // Show "Click to Continue" button instead of a timeout
-        disableClick = true;
-        showContinueButton();
     }
 
     // Function to show the "Click to Continue" button
@@ -547,68 +503,13 @@
         }
     });
 
-    // Function to get a random "You guessed right" message
-    function getRandomWinMessage() {
-        const randomIndex = Math.floor(Math.random() * winMessages.length);
-        return winMessages[randomIndex];
-    }
-
-    function getRandomLoseMessage() {
-        const randomIndex = Math.floor(Math.random() * loseMessages.length);
-        return loseMessages[randomIndex];
-    }
-
-    // Check if the selected answer is correct
-    function checkAnswer(selectedBox) {
-        if (disableClick) return;
-        const isCorrect = selectedBox.dataset.correct === 'true';
-        const message = document.getElementById('message');
-
-        if (isCorrect) {
-            message.textContent = getRandomWinMessage(); // Use a random win message
-            message.style.color = 'green';
-
-            // Trigger multiple fireworks at random positions in the top half of the screen
-            triggerMultipleFireworks();
-
-            // Fade all incorrect color blocks
-            document.querySelectorAll('.color-box').forEach(box => {
-                if (!box.dataset.correct) {
-                    fadeBlock(box);
-                }
-            });
-        } else {
-            message.textContent = getRandomLoseMessage();
-            message.style.color = 'red';
-
-            // Shatter all incorrect color blocks
-            document.querySelectorAll('.color-box').forEach(box => {
-                const rect = box.getBoundingClientRect();
-                if (!box.dataset.correct) {
-                    shatterBlock({
-                        x: rect.left,
-                        y: rect.top,
-                        width: rect.width,
-                        height: rect.height,
-                        color: window.getComputedStyle(box).backgroundColor
-                    });
-                    box.style.visibility = 'hidden'; // Hide the block after shattering
-                }
-            });
-        }
-
-        // Show "Click to Continue" button instead of a timeout
-        disableClick = true;
-        showContinueButton();
-    }
-
     const winMessages = [
         'Nailed it! You’ve got the magic touch!',
         'Bingo! Right on the money!',
         'You hit the bullseye! Color master in the house!',
         'Color genius detected!',
         'Boom! Spot on, color wizard!',
-        'Winner, winner, color guesser!',
+        'Winner, winner, color... dinner?',
         'You guessed it, you legend!',
         'Yes! Color guessing champion!',
         'You’ve got the eye of a color detective!',
@@ -655,58 +556,127 @@
         'You’ve just achieved color mastery!'
     ];
 
-    let loseMessages = [
-        "Oops! Not quite the right shade. Give it another go!",
-        "Close, but no rainbow! Try again!",
-        "That’s a nope! Back to the drawing board!",
-        "Whoops! Wrong color. Try your luck again!",
-        "Almost, but not quite! Go for another round!",
-        "Missed it by a shade! Try again!",
-        "Nice try, but that’s a color misfire!",
-        "Uh-oh! Wrong color. Don’t give up now!",
-        "Swing and a miss! Try another hue!",
-        "Not this time! Spin the color wheel again!",
-        "Color malfunction! Give it another whirl!",
-        "Oopsie! Wrong color vibes. Take a second shot!",
-        "Close, but not colorful enough! Try again!",
-        "That’s not it, but you’re getting warmer!",
-        "Wrong shade! Let’s give it another shot!",
-        "Oops! Color malfunction detected. Try again!",
-        "Not quite! You’re on the right track though!",
-        "Almost! Keep your eyes on the color prize!",
-        "Uh-oh, wrong color combo! Have another go!",
-        "Whoops! Color guess detour. Try again!",
-        "Color miss! Don’t worry, try another guess!",
-        "Not the right color, but you’re close!",
-        "Wrong one, but I believe in you! Try again!",
-        "That’s a no-go! Pick another color!",
-        "Oops, that’s not it! You’ve got this!",
-        "Color misfire! But hey, no worries, try again!",
-        "Uh-oh! Off by a shade. Have another guess!",
-        "Swing and a miss! Reload your color senses!",
-        "Wrong guess, but don’t give up!",
-        "Try again! The color gods aren’t impressed yet!",
-        "Oops, color fail! Don’t worry, you got this next time!",
-        "Nope! Your color compass needs recalibrating!",
-        "That’s a miss! Back to the color wheel!",
-        "Not this one! But hey, you’re one guess closer!",
-        "Oh dear, color error! Better luck next guess!",
-        "Whoops! Wrong shade. Try again!",
-        "Missed it! Let’s try another guess!",
-        "Nope, that’s not the one. Keep at it!",
-        "Color mismatch! Don’t give up yet!",
-        "That’s not it! Reload your color guessing!",
-        "Oh no! Wrong color alert! Try again!",
-        "No dice! Color guess fail. Spin the wheel again!",
-        "Oops! Color code not cracked. Try again!",
-        "Missed by a shade! Guess again!",
-        "Nope, that’s not the hue! Try another!",
-        "Wrong color! But hey, you’re close!",
-        "Miss! The color was hiding from you. Try again!",
-        "Whoops! Color confusion! Take another guess!",
-        "Uh-oh! The color dodged your guess. Try again!",
-        "Not this time! But you’re warming up!"
+    const loseMessages = [
+        'Oops! Not quite the right shade. Give it another go!',
+        'Close, but no rainbow! Try again!',
+        'That’s a nope! Back to the drawing board!',
+        'Whoops! Wrong color. Try your luck again!',
+        'Almost, but not quite! Go for another round!',
+        'Missed it by a shade! Try again!',
+        'Nice try, but that’s a color misfire!',
+        'Uh-oh! Wrong color. Don’t give up now!',
+        'Swing and a miss! Try another hue!',
+        'Not this time! Spin the color wheel again!',
+        'Color malfunction! Give it another whirl!',
+        'Oopsie! Wrong color vibes. Take a second shot!',
+        'Close, but not colorful enough! Try again!',
+        'That’s not it, but you’re getting warmer!',
+        'Wrong shade! Let’s give it another shot!',
+        'Oops! Color malfunction detected. Try again!',
+        'Not quite! You’re on the right track though!',
+        'Almost! Keep your eyes on the color prize!',
+        'Uh-oh, wrong color combo! Have another go!',
+        'Whoops! Color guess detour. Try again!',
+        'Color miss! Don’t worry, try another guess!',
+        'Not the right color, but you’re close!',
+        'Wrong one, but I believe in you! Try again!',
+        'That’s a no-go! Pick another color!',
+        'Oops, that’s not it! You’ve got this!',
+        'Color misfire! But hey, no worries, try again!',
+        'Uh-oh! Off by a shade. Have another guess!',
+        'Swing and a miss! Reload your color senses!',
+        'Wrong guess, but don’t give up!',
+        'Try again! The color gods aren’t impressed yet!',
+        'Oops, color fail! Don’t worry, you got this next time!',
+        'Nope! Your color compass needs recalibrating!',
+        'That’s a miss! Back to the color wheel!',
+        'Not this one! But hey, you’re one guess closer!',
+        'Oh dear, color error! Better luck next guess!',
+        'Whoops! Wrong shade. Try again!',
+        'Missed it! Let’s try another guess!',
+        'Nope, that’s not the one. Keep at it!',
+        'Color mismatch! Don’t give up yet!',
+        'That’s not it! Reload your color guessing!',
+        'Oh no! Wrong color alert! Try again!',
+        'No dice! Color guess fail. Spin the wheel again!',
+        'Oops! Color code not cracked. Try again!',
+        'Missed by a shade! Guess again!',
+        'Nope, that’s not the hue! Try another!',
+        'Wrong color! But hey, you’re close!',
+        'Miss! The color was hiding from you. Try again!',
+        'Whoops! Color confusion! Take another guess!',
+        'Uh-oh! The color dodged your guess. Try again!',
+        'Not this time! But you’re warming up!'
     ];
+
+    let currentWinMessageIndex = 0;
+    let currentLoseMessageIndex = 0;
+
+    function shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+    }
+
+    function getNextWinMessageString() {
+        const message = winMessages[currentWinMessageIndex];
+        currentWinMessageIndex = (currentWinMessageIndex + 1) % winMessages.length; // Loop back to the beginning if at the end
+        return message;
+    }
+
+    function getNextLoseMessageString() {
+        const message = loseMessages[currentLoseMessageIndex];
+        currentLoseMessageIndex = (currentLoseMessageIndex + 1) % loseMessages.length; // Loop back to the beginning if at the end
+        return message;
+    }
+
+    shuffleArray(winMessages);
+    shuffleArray(loseMessages);
+
+    // Check if the selected answer is correct
+    function checkAnswer(selectedBox) {
+        if (disableClick) return;
+        const isCorrect = selectedBox.dataset.correct === 'true';
+        const message = document.getElementById('message');
+
+        if (isCorrect) {
+            message.textContent = getNextWinMessageString(); // Use a random win message
+            message.style.color = 'green';
+
+            // Trigger multiple fireworks at random positions in the top half of the screen
+            triggerMultipleFireworks();
+
+            // Fade all incorrect color blocks
+            document.querySelectorAll('.color-box').forEach(box => {
+                if (!box.dataset.correct) {
+                    fadeBlock(box);
+                }
+            });
+        } else {
+            message.textContent = getNextLoseMessageString();
+            message.style.color = 'red';
+
+            // Shatter all incorrect color blocks
+            document.querySelectorAll('.color-box').forEach(box => {
+                const rect = box.getBoundingClientRect();
+                if (!box.dataset.correct) {
+                    shatterBlock({
+                        x: rect.left,
+                        y: rect.top,
+                        width: rect.width,
+                        height: rect.height,
+                        color: window.getComputedStyle(box).backgroundColor
+                    });
+                    box.style.visibility = 'hidden'; // Hide the block after shattering
+                }
+            });
+        }
+
+        // Show "Click to Continue" button instead of a timeout
+        disableClick = true;
+        showContinueButton();
+    }
 
     document.addEventListener('DOMContentLoaded', () => {
         // Select the elements

@@ -553,6 +553,11 @@
         return winMessages[randomIndex];
     }
 
+    function getRandomLoseMessage() {
+        const randomIndex = Math.floor(Math.random() * loseMessages.length);
+        return loseMessages[randomIndex];
+    }
+
     // Check if the selected answer is correct
     function checkAnswer(selectedBox) {
         if (disableClick) return;
@@ -573,7 +578,7 @@
                 }
             });
         } else {
-            message.textContent = 'Wrong! Try again!';
+            message.textContent = getRandomLoseMessage();
             message.style.color = 'red';
 
             // Shatter all incorrect color blocks
@@ -648,6 +653,59 @@
         'You guessed the shade like a legend!',
         'High five, color magician!',
         'You’ve just achieved color mastery!'
+    ];
+
+    let loseMessages = [
+        "Oops! Not quite the right shade. Give it another go!",
+        "Close, but no rainbow! Try again!",
+        "That’s a nope! Back to the drawing board!",
+        "Whoops! Wrong color. Try your luck again!",
+        "Almost, but not quite! Go for another round!",
+        "Missed it by a shade! Try again!",
+        "Nice try, but that’s a color misfire!",
+        "Uh-oh! Wrong color. Don’t give up now!",
+        "Swing and a miss! Try another hue!",
+        "Not this time! Spin the color wheel again!",
+        "Color malfunction! Give it another whirl!",
+        "Oopsie! Wrong color vibes. Take a second shot!",
+        "Close, but not colorful enough! Try again!",
+        "That’s not it, but you’re getting warmer!",
+        "Wrong shade! Let’s give it another shot!",
+        "Oops! Color malfunction detected. Try again!",
+        "Not quite! You’re on the right track though!",
+        "Almost! Keep your eyes on the color prize!",
+        "Uh-oh, wrong color combo! Have another go!",
+        "Whoops! Color guess detour. Try again!",
+        "Color miss! Don’t worry, try another guess!",
+        "Not the right color, but you’re close!",
+        "Wrong one, but I believe in you! Try again!",
+        "That’s a no-go! Pick another color!",
+        "Oops, that’s not it! You’ve got this!",
+        "Color misfire! But hey, no worries, try again!",
+        "Uh-oh! Off by a shade. Have another guess!",
+        "Swing and a miss! Reload your color senses!",
+        "Wrong guess, but don’t give up!",
+        "Try again! The color gods aren’t impressed yet!",
+        "Oops, color fail! Don’t worry, you got this next time!",
+        "Nope! Your color compass needs recalibrating!",
+        "That’s a miss! Back to the color wheel!",
+        "Not this one! But hey, you’re one guess closer!",
+        "Oh dear, color error! Better luck next guess!",
+        "Whoops! Wrong shade. Try again!",
+        "Missed it! Let’s try another guess!",
+        "Nope, that’s not the one. Keep at it!",
+        "Color mismatch! Don’t give up yet!",
+        "That’s not it! Reload your color guessing!",
+        "Oh no! Wrong color alert! Try again!",
+        "No dice! Color guess fail. Spin the wheel again!",
+        "Oops! Color code not cracked. Try again!",
+        "Missed by a shade! Guess again!",
+        "Nope, that’s not the hue! Try another!",
+        "Wrong color! But hey, you’re close!",
+        "Miss! The color was hiding from you. Try again!",
+        "Whoops! Color confusion! Take another guess!",
+        "Uh-oh! The color dodged your guess. Try again!",
+        "Not this time! But you’re warming up!"
     ];
 
     document.addEventListener('DOMContentLoaded', () => {

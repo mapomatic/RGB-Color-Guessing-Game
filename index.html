@@ -13,18 +13,20 @@
 			background-color: black; /* Set background to black */
 			color: white; /* Set text color to white */
 		}
-		.color-box {
-			display: inline-block;
-			width: 100px;
-			height: 100px;
-			margin: 10px;
-			cursor: pointer;
-			border-radius: 8px;
-			border: none; /* Ensure border is removed */
-			/* background: linear-gradient(135deg, rgba(255, 255, 255, 0.3), rgba(0, 0, 0, 0.2)); /* Gradient for 3D effect */
-			/* Remove the box-shadow line */
-			/* box-shadow: inset 0px 0px 0px 5px ${darkerColor}, 3px 3px 8px rgba(0, 0, 0, 0.5); */
-		}
+        .color-box {
+            display: inline-block;
+            width: 100px;
+            height: 100px;
+            margin: 10px;
+            cursor: pointer;
+            border-radius: 8px;
+            border: none;
+            transition: transform 0.1s ease-in-out; /* Smooth scale transition */
+            position: relative; /* For proper z-index context */
+        }
+        .color-box:hover {
+            transform: scale(1.03); /* Slightly increase the size on hover */
+        }
         #continueButton {
             display: block; /* Make the button a block element */
             margin: 20px auto 0; /* Add top margin to separate from the message */

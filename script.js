@@ -37,6 +37,7 @@
         }
     });
 
+    // Function to update the bounding boxes of the color boxes
     function updateCollisionBoxes() {
         colorBlocks = Array.from(document.querySelectorAll('.color-box')).map(box => {
             const rect = box.getBoundingClientRect();
@@ -94,52 +95,51 @@
         };
     }
 
-// Function to get the bounding box of the Continue button
-function getContinueButtonBox() {
-    const continueButton = document.getElementById('continueButton');
-    if (continueButton) {
-        const rect = continueButton.getBoundingClientRect();
-        return {
-            x: rect.left,
-            y: rect.top,
-            width: rect.width,
-            height: rect.height
-        };
+    // Function to get the bounding box of the Continue button
+    function getContinueButtonBox() {
+        const continueButton = document.getElementById('continueButton');
+        if (continueButton) {
+            const rect = continueButton.getBoundingClientRect();
+            return {
+                x: rect.left,
+                y: rect.top,
+                width: rect.width,
+                height: rect.height
+            };
+        }
+        return null;
     }
-    return null;
-}
 
-// Function to handle bouncing off the continue button
-function bounceOffButton(particle, buttonBox) {
+    // Function to handle bouncing off the continue button
+    function bounceOffButton(particle, buttonBox) {
     // Check if particle is within the bounds of the button
-    if (
-        particle.x > buttonBox.x &&
-        particle.x < buttonBox.x + buttonBox.width &&
-        particle.y > buttonBox.y &&
-        particle.y < buttonBox.y + buttonBox.height
-    ) {
+        if (
+            particle.x > buttonBox.x
+        && particle.x < buttonBox.x + buttonBox.width
+        && particle.y > buttonBox.y
+        && particle.y < buttonBox.y + buttonBox.height
+        ) {
         // Determine which side the particle hit
-        const dxLeft = Math.abs(particle.x - buttonBox.x);
-        const dxRight = Math.abs(particle.x - (buttonBox.x + buttonBox.width));
-        const dyTop = Math.abs(particle.y - buttonBox.y);
-        const dyBottom = Math.abs(particle.y - (buttonBox.y + buttonBox.height));
+            const dxLeft = Math.abs(particle.x - buttonBox.x);
+            const dxRight = Math.abs(particle.x - (buttonBox.x + buttonBox.width));
+            const dyTop = Math.abs(particle.y - buttonBox.y);
+            const dyBottom = Math.abs(particle.y - (buttonBox.y + buttonBox.height));
 
-        const minDist = Math.min(dxLeft, dxRight, dyTop, dyBottom);
+            const minDist = Math.min(dxLeft, dxRight, dyTop, dyBottom);
 
-        if (minDist === dxLeft || minDist === dxRight) {
+            if (minDist === dxLeft || minDist === dxRight) {
             // Hit left or right side, reverse horizontal velocity
-            particle.vx *= -particle.elasticity;
-            // Adjust position to avoid sticking
-            particle.x += (minDist === dxLeft ? -1 : 1);
-        } else if (minDist === dyTop || minDist === dyBottom) {
+                particle.vx *= -particle.elasticity;
+                // Adjust position to avoid sticking
+                particle.x += (minDist === dxLeft ? -1 : 1);
+            } else if (minDist === dyTop || minDist === dyBottom) {
             // Hit top or bottom side, reverse vertical velocity
-            particle.vy *= -particle.elasticity;
-            // Adjust position to avoid sticking
-            particle.y += (minDist === dyTop ? -1 : 1);
+                particle.vy *= -particle.elasticity;
+                // Adjust position to avoid sticking
+                particle.y += (minDist === dyTop ? -1 : 1);
+            }
         }
     }
-}
-
 
     // Set up the game
     function setupGame() {
@@ -263,81 +263,80 @@ function bounceOffButton(particle, buttonBox) {
         });
     }
 
- // Animate all fireworks and launch particles
-function animate() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    // Animate all fireworks and launch particles
+    function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    const continueButtonBox = getContinueButtonBox(); // Get the Continue button bounding box
+        const continueButtonBox = getContinueButtonBox(); // Get the Continue button bounding box
 
-    // Update and draw each launch particle
-    launchParticles.forEach((particle, index) => {
-        const distanceToTarget = Math.sqrt((particle.targetX - particle.x) ** 2 + (particle.targetY - particle.y) ** 2);
+        // Update and draw each launch particle
+        launchParticles.forEach((particle, index) => {
+            const distanceToTarget = Math.sqrt((particle.targetX - particle.x) ** 2 + (particle.targetY - particle.y) ** 2);
 
-        if (distanceToTarget < 5 || (particle.vx * (particle.targetX - particle.x) <= 0 && particle.vy * (particle.targetY - particle.y) <= 0)) {
-            particle.callback(); // Trigger the explosion
-            launchParticles.splice(index, 1); // Remove the particle
-        } else {
-            ctx.fillStyle = 'white';
-            ctx.beginPath();
-            ctx.arc(particle.x, particle.y, 2, 0, Math.PI * 2); // Draw the particle
-            ctx.fill();
-
-            // Update particle position
-            particle.x += particle.vx;
-            particle.y += particle.vy + particle.gravity * particle.frame;
-            particle.frame++;
-        }
-    });
-
-    // Iterate through all fireworks and animate them
-    fireworks.forEach((particles, index) => {
-        particles.forEach(particle => {
-            if (particle.life > 0) {
-                const fadeStart = particle.isGuessFirework ? particle.maxLife * 0.6 : particle.maxLife * 0.9;
-                const fadeEnd = particle.maxLife;
-                const fadeProgress = Math.max(0, (particle.life - fadeStart) / (fadeEnd - fadeStart));
-                particle.alpha = fadeProgress;
-
-                ctx.fillStyle = `rgba(${
-                    parseInt(particle.color.slice(5, 8), 10)}, ${
-                    parseInt(particle.color.slice(10, 13), 10)}, ${
-                    parseInt(particle.color.slice(15, 18), 10)}, ${
-                    particle.alpha})`;
+            if (distanceToTarget < 5 || (particle.vx * (particle.targetX - particle.x) <= 0 && particle.vy * (particle.targetY - particle.y) <= 0)) {
+                particle.callback(); // Trigger the explosion
+                launchParticles.splice(index, 1); // Remove the particle
+            } else {
+                ctx.fillStyle = 'white';
                 ctx.beginPath();
-                ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2); // Draw particles with varying sizes
+                ctx.arc(particle.x, particle.y, 2, 0, Math.PI * 2); // Draw the particle
                 ctx.fill();
 
-                particle.vy += particle.gravity;
+                // Update particle position
                 particle.x += particle.vx;
-                particle.y += particle.vy;
-
-                // Check for collision with the Continue button and handle bouncing
-                if (continueButtonBox) {
-                    bounceOffButton(particle, continueButtonBox);
-                }
-
-                if (particle.y >= canvas.height) {
-                    particle.y = canvas.height;
-                    particle.vy *= -particle.groundElasticity * particle.elasticity;
-                    particle.vx *= particle.elasticity;
-                    particle.bounceCount++;
-                }
-
-                handleCollision(particle);
-                particle.life--;
+                particle.y += particle.vy + particle.gravity * particle.frame;
+                particle.frame++;
             }
         });
 
-        fireworks[index] = particles.filter(p => p.life > 0);
-    });
+        // Iterate through all fireworks and animate them
+        fireworks.forEach((particles, index) => {
+            particles.forEach(particle => {
+                if (particle.life > 0) {
+                    const fadeStart = particle.isGuessFirework ? particle.maxLife * 0.6 : particle.maxLife * 0.9;
+                    const fadeEnd = particle.maxLife;
+                    const fadeProgress = Math.max(0, (particle.life - fadeStart) / (fadeEnd - fadeStart));
+                    particle.alpha = fadeProgress;
 
-    while (fireworks.length && fireworks[0].length === 0) {
-        fireworks.shift();
+                    ctx.fillStyle = `rgba(${
+                        parseInt(particle.color.slice(5, 8), 10)}, ${
+                        parseInt(particle.color.slice(10, 13), 10)}, ${
+                        parseInt(particle.color.slice(15, 18), 10)}, ${
+                        particle.alpha})`;
+                    ctx.beginPath();
+                    ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2); // Draw particles with varying sizes
+                    ctx.fill();
+
+                    particle.vy += particle.gravity;
+                    particle.x += particle.vx;
+                    particle.y += particle.vy;
+
+                    // Check for collision with the Continue button and handle bouncing
+                    if (continueButtonBox) {
+                        bounceOffButton(particle, continueButtonBox);
+                    }
+
+                    if (particle.y >= canvas.height) {
+                        particle.y = canvas.height;
+                        particle.vy *= -particle.groundElasticity * particle.elasticity;
+                        particle.vx *= particle.elasticity;
+                        particle.bounceCount++;
+                    }
+
+                    handleCollision(particle);
+                    particle.life--;
+                }
+            });
+
+            fireworks[index] = particles.filter(p => p.life > 0);
+        });
+
+        while (fireworks.length && fireworks[0].length === 0) {
+            fireworks.shift();
+        }
+        animateShatterPieces();
+        requestAnimationFrame(animate);
     }
-animateShatterPieces();
-    requestAnimationFrame(animate);
-}
-
 
     // Function to trigger multiple firework explosions at random positions
     function triggerMultipleFireworks() {
@@ -455,35 +454,32 @@ animateShatterPieces();
         colorBlocks = colorBlocks.filter(b => !(b.x === block.x && b.y === block.y && b.width === block.width && b.height === block.height));
     }
 
- // Animate shatter pieces
-function animateShatterPieces() {
-    const continueButtonBox = getContinueButtonBox(); // Get the Continue button bounding box
+    // Animate shatter pieces
+    function animateShatterPieces() {
+        shatterPieces.forEach((piece, index) => {
+            piece.vy += piece.gravity; // Apply gravity
+            piece.x += piece.vx; // Update horizontal position
+            piece.y += piece.vy; // Update vertical position
+            piece.rotation += piece.rotationSpeed; // Update rotation
 
-    shatterPieces.forEach((piece, index) => {
-        piece.vy += piece.gravity; // Apply gravity
-        piece.x += piece.vx; // Update horizontal position
-        piece.y += piece.vy; // Update vertical position
-        piece.rotation += piece.rotationSpeed; // Update rotation
+            ctx.save();
+            ctx.translate(piece.x + piece.width / 2, piece.y + piece.height / 2);
+            ctx.rotate(piece.rotation);
+            ctx.fillStyle = piece.color;
 
-        ctx.save();
-        ctx.translate(piece.x + piece.width / 2, piece.y + piece.height / 2);
-        ctx.rotate(piece.rotation);
-        ctx.fillStyle = piece.color;
+            ctx.beginPath();
+            ctx.rect(-piece.width / 2, -piece.height / 2, piece.width, piece.height); // Draw shatter piece
+            ctx.closePath();
+            ctx.fill();
 
-        ctx.beginPath();
-        ctx.rect(-piece.width / 2, -piece.height / 2, piece.width, piece.height); // Draw shatter piece
-        ctx.closePath();
-        ctx.fill();
+            ctx.restore();
 
-        ctx.restore();
-
-        // Remove pieces that have fallen off the screen
-        if (piece.y - piece.height > canvas.height) {
-            shatterPieces.splice(index, 1);
-        }
-    });
-}
-
+            // Remove pieces that have fallen off the screen
+            if (piece.y - piece.height > canvas.height) {
+                shatterPieces.splice(index, 1);
+            }
+        });
+    }
 
     function fadeBlock(blockElement) {
         const targetColor = '#333333'; // Dark gray color for the fade effect

@@ -108,35 +108,34 @@
 
         // Create 3 color options
         // Create 3 color options
-for (let i = 0; i < 3; i++) {
-    const colorBox = document.createElement('div');
-    colorBox.classList.add('color-box');
+        for (let i = 0; i < 3; i++) {
+            const colorBox = document.createElement('div');
+            colorBox.classList.add('color-box');
 
-    // The correct color goes into the correct box
-    let boxColor;
-    if (i === correctIndex) {
-        boxColor = color;
-        colorBox.style.backgroundColor = colorToGuess;
-        colorBox.dataset.correct = 'true';
-    } else {
-        boxColor = getRandomColor();
-        colorBox.style.backgroundColor = `rgb(${boxColor.r}, ${boxColor.g}, ${boxColor.b})`;
-    }
+            // The correct color goes into the correct box
+            let boxColor;
+            if (i === correctIndex) {
+                boxColor = color;
+                colorBox.style.backgroundColor = colorToGuess;
+                colorBox.dataset.correct = 'true';
+            } else {
+                boxColor = getRandomColor();
+                colorBox.style.backgroundColor = `rgb(${boxColor.r}, ${boxColor.g}, ${boxColor.b})`;
+            }
 
-    // Set the box shadow to match the color of the box for an outer glow effect
-    const glowColor = `rgba(${boxColor.r}, ${boxColor.g}, ${boxColor.b}, 0.6)`; // Adjust opacity as needed
-    colorBox.style.boxShadow = `
+            // Set the box shadow to match the color of the box for an outer glow effect
+            const glowColor = `rgba(${boxColor.r}, ${boxColor.g}, ${boxColor.b}, 0.6)`; // Adjust opacity as needed
+            colorBox.style.boxShadow = `
         0 0 15px ${glowColor},  /* Outer glow effect */
         0 0 25px ${glowColor}   /* Additional softer glow */
     `;
 
-    colorBox.addEventListener('click', function colorBoxClick() {
-        checkAnswer(this);
-    });
+            colorBox.addEventListener('click', function colorBoxClick() {
+                checkAnswer(this);
+            });
 
-    choicesContainer.appendChild(colorBox);
-}
-
+            choicesContainer.appendChild(colorBox);
+        }
 
         // Update colorBlocks with the current color boxes positions
         updateCollisionBoxes();
@@ -336,20 +335,19 @@ for (let i = 0; i < 3; i++) {
         launchParticles.push(particle);
     }
 
-    
     // Check if the selected answer is correct
     function checkAnswer(selectedBox) {
         if (disableClick) return;
         const isCorrect = selectedBox.dataset.correct === 'true';
         const message = document.getElementById('message');
-    
+
         if (isCorrect) {
             message.textContent = 'Correct! You guessed the color!';
             message.style.color = 'green';
-    
+
             // Trigger multiple fireworks at random positions in the top half of the screen
             triggerMultipleFireworks();
-    
+
             // Fade all incorrect color blocks
             document.querySelectorAll('.color-box').forEach(box => {
                 if (!box.dataset.correct) {
@@ -359,7 +357,7 @@ for (let i = 0; i < 3; i++) {
         } else {
             message.textContent = 'Wrong! Try again!';
             message.style.color = 'red';
-    
+
             // Shatter all incorrect color blocks
             document.querySelectorAll('.color-box').forEach(box => {
                 const rect = box.getBoundingClientRect();
@@ -375,29 +373,28 @@ for (let i = 0; i < 3; i++) {
                 }
             });
         }
-    
+
         // Show "Click to Continue" button instead of a timeout
         disableClick = true;
         showContinueButton();
     }
 
     // Function to show the "Click to Continue" button
-function showContinueButton() {
-    const continueButton = document.createElement('button');
-    continueButton.textContent = 'Continue';
-    continueButton.id = 'continueButton';
-    continueButton.classList.add('continue-button'); // Apply the CSS class
+    function showContinueButton() {
+        const continueButton = document.createElement('button');
+        continueButton.textContent = 'Continue';
+        continueButton.id = 'continueButton';
+        continueButton.classList.add('continue-button'); // Apply the CSS class
 
-    document.body.appendChild(continueButton);
+        document.body.appendChild(continueButton);
 
-    continueButton.addEventListener('click', () => {
-        document.body.removeChild(continueButton); // Remove button after click
-        disableClick = false;
-        message.textContent = '';
-        setupGame();
-    });
-}
-
+        continueButton.addEventListener('click', () => {
+            document.body.removeChild(continueButton); // Remove button after click
+            disableClick = false;
+            message.textContent = '';
+            setupGame();
+        });
+    }
 
     // Create shatter pieces for a wrong color block guess
     function shatterBlock(block) {
@@ -529,7 +526,6 @@ function showContinueButton() {
             }
         }, 15); // Adjust the interval timing for smoother animation if needed
     }
-    
 
     // Start the game when the page loads
     setupGame();
@@ -541,35 +537,137 @@ function showContinueButton() {
         updateCollisionBoxes(); // Recalculate collision boxes positions on resize
     });
 
-// Firework effect anywhere on click, except on color boxes and specific buttons
-document.addEventListener('click', event => {
+    // Firework effect anywhere on click, except on color boxes and specific buttons
+    document.addEventListener('click', event => {
     // Check if the click is not on a color box, the fullscreen button, or the continue button
-    if (!event.target.classList.contains('color-box') 
-        && event.target.id !== 'fullscreenButton' 
+        if (!event.target.classList.contains('color-box')
+        && event.target.id !== 'fullscreenButton'
         && event.target.id !== 'continueButton') {
-        firework(event.clientX, event.clientY); // No flag for click fireworks
+            firework(event.clientX, event.clientY); // No flag for click fireworks
+        }
+    });
+
+    // Function to get a random "You guessed right" message
+    function getRandomWinMessage() {
+        const randomIndex = Math.floor(Math.random() * winMessages.length);
+        return winMessages[randomIndex];
     }
-});
+
+    // Check if the selected answer is correct
+    function checkAnswer(selectedBox) {
+        if (disableClick) return;
+        const isCorrect = selectedBox.dataset.correct === 'true';
+        const message = document.getElementById('message');
+
+        if (isCorrect) {
+            message.textContent = getRandomWinMessage(); // Use a random win message
+            message.style.color = 'green';
+
+            // Trigger multiple fireworks at random positions in the top half of the screen
+            triggerMultipleFireworks();
+
+            // Fade all incorrect color blocks
+            document.querySelectorAll('.color-box').forEach(box => {
+                if (!box.dataset.correct) {
+                    fadeBlock(box);
+                }
+            });
+        } else {
+            message.textContent = 'Wrong! Try again!';
+            message.style.color = 'red';
+
+            // Shatter all incorrect color blocks
+            document.querySelectorAll('.color-box').forEach(box => {
+                const rect = box.getBoundingClientRect();
+                if (!box.dataset.correct) {
+                    shatterBlock({
+                        x: rect.left,
+                        y: rect.top,
+                        width: rect.width,
+                        height: rect.height,
+                        color: window.getComputedStyle(box).backgroundColor
+                    });
+                    box.style.visibility = 'hidden'; // Hide the block after shattering
+                }
+            });
+        }
+
+        // Show "Click to Continue" button instead of a timeout
+        disableClick = true;
+        showContinueButton();
+    }
+
+    const winMessages = [
+        'Nailed it! You’ve got the magic touch!',
+        'Bingo! Right on the money!',
+        'You hit the bullseye! Color master in the house!',
+        'Color genius detected!',
+        'Boom! Spot on, color wizard!',
+        'Winner, winner, color guesser!',
+        'You guessed it, you legend!',
+        'Yes! Color guessing champion!',
+        'You’ve got the eye of a color detective!',
+        'You’re on fire! Perfect guess!',
+        "Did someone say 'Color Guru'? Oh wait, that's you!",
+        'That’s how it’s done! Boom!',
+        'You just cracked the color code!',
+        'That’s the shade! You rock!',
+        'Color mastery unlocked!',
+        'You nailed it like a pro!',
+        'You guessed it, Picasso!',
+        'Spot on! Color guessing level: expert!',
+        'Bam! Another one for the win!',
+        'You’re like a color whisperer!',
+        'Oh snap! You got it right!',
+        'You called it like a boss!',
+        'Holy hue! You guessed it!',
+        'Give yourself a high five! Nailed it!',
+        'Color connoisseur alert!',
+        'Boom! Right on the color mark!',
+        'It’s like you can see colors or something!',
+        'Bravo! Right on target!',
+        'Oh yeah, you’ve got this!',
+        'You guessed it with style!',
+        'That’s how you do it! Bullseye!',
+        'Winner of the color Olympics!',
+        'You’ve got the color radar!',
+        'Yep, that’s the one! Genius!',
+        'Your color-guessing skills are next level!',
+        'You guessed that like a pro!',
+        'That’s the hue, and you knew!',
+        'Crushed it! Color guessing extraordinaire!',
+        'Boom! Another perfect guess!',
+        'Spot on! You’re a color sleuth!',
+        'Color guessing hall of fame material!',
+        'That’s it! You’ve got the magic palette!',
+        'You guessed it right, paint whisperer!',
+        'You’re officially a color clairvoyant!',
+        'You’ve got the eyes of a color hawk!',
+        'Shazam! Right on target!',
+        'You’re a color prophet!',
+        'You guessed the shade like a legend!',
+        'High five, color magician!',
+        'You’ve just achieved color mastery!'
+    ];
 
     document.addEventListener('DOMContentLoaded', () => {
         // Select the elements
         const title = document.querySelector('h1'); // Select the game title
         const instructions = document.querySelector('p'); // Select the instruction line
-    
+
         // Function to fade out an element
         function fadeOutElement(element, delay) {
             setTimeout(() => {
                 element.classList.add('fade-out'); // Add the fade-out class after delay
             }, delay);
         }
-    
+
         // Fade out the title first
         fadeOutElement(title, 2000); // Fade out the title after 2 seconds
-    
+
         // Fade out the instructions after the title has faded out
         fadeOutElement(instructions, 4000); // Fade out the instructions after an additional 2 seconds
     });
-       
 
     // Start animating all particles
     animate();

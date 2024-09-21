@@ -70,6 +70,8 @@
 
     // Reference to the audio element
     const fireworkSound = document.getElementById('fireworkSound');
+    const wrongSound = document.getElementById('wrongSound');
+    const rightSound = document.getElementById('rightSound');
 
     // Generate random RGB color
     function getRandomColor() {
@@ -191,6 +193,16 @@
     // Play firework explosion sound with clones
     function playFireworkSound() {
         const soundClone = fireworkSound.cloneNode(); // Clone the audio element
+        soundClone.play(); // Play the cloned sound
+    }
+
+    function playWrongSound() {
+        const soundClone = wrongSound.cloneNode(); // Clone the audio element
+        soundClone.play(); // Play the cloned sound
+    }
+
+    function playRightSound() {
+        const soundClone = rightSound.cloneNode(); // Clone the audio element
         soundClone.play(); // Play the cloned sound
     }
 
@@ -661,6 +673,8 @@
             message.textContent = getNextWinMessageString(); // Use a random win message
             message.style.color = 'green';
 
+            playRightSound();
+
             // Trigger multiple fireworks at random positions in the top half of the screen
             triggerMultipleFireworks();
 
@@ -673,6 +687,8 @@
         } else {
             message.textContent = getNextLoseMessageString();
             message.style.color = 'red';
+
+            playWrongSound();
 
             // Shatter all incorrect color blocks
             document.querySelectorAll('.color-box').forEach(box => {
